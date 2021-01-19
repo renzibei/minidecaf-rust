@@ -1,0 +1,15 @@
+job 1:
+    script:
+        - bash ./prepare.sh
+        - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@git.tsinghua.edu.cn/decaf-lang/minidecaf-tests.git
+        - PROJ_PATH=..  STEP_UNTIL=`cat step-until.txt` USE_PARALLEL=false minidecaf-tests/check.sh
+        - |
+          echo "Checking reports:" ;
+          for i in $(seq $(cat step-until.txt)); do
+              if ! [[ -f reports/step$i.pdf || -f reports/step$i.md ]]; then
+                  echo "Report for step$i needed. Add your report to reports/step$i.pdf or reports/step$i.md" ;
+                  exit 1 ;
+              else
+                  echo "Report for step$i found." ;
+              fi ;
+          done
